@@ -1,2 +1,2 @@
 # SQL_tutorial
-YouTube SQL Tutorial
+YouTube SQL Tutorial + Projects
