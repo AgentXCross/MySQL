@@ -7,3 +7,5 @@ Luke Barousse SQL for Data Analytics --> https://www.youtube.com/watch?v=7mz73uX
 
 ## Projects
 https://github.com/AlexTheAnalyst/MySQL-YouTube-Series/blob/main/layoffs.csv --> Data Cleaning and Exploratory Data Analysis Project on Pandemic Layoffs
+
+https://drive.google.com/drive/folders/1moeWYoUtUklJO6NJdWo9OV8zWjRn0rjN --> Exploratory Data Analysis on Data Science Job Postings
