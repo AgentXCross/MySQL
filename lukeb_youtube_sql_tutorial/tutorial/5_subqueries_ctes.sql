@@ -49,7 +49,7 @@ ON c.company_id = n.company_id
 ORDER BY n.total_jobs_per_company DESC;
 
 /*
-Find the count of the number of remote job postings per skill
+Find the count of the number of remote job postings per skill for Data Analysts
 - Display top 5 skills
 - Include skill_id, skill_name, and count of postings requiring the skill
 */
@@ -58,6 +58,7 @@ WITH remote_jobs AS (
     SELECT job_id
     FROM job_postings_fact
     WHERE job_work_from_home = true
+    AND job_title_short = 'Data Analyst'
 ),
 skill_id_name AS (
     SELECT sjd.job_id, sjd.skill_id, sd.skills
