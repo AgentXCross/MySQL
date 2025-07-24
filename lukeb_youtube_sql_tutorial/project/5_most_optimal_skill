@@ -1,0 +1,73 @@
+/*
+Question 5: Find most optimal skills with high demand and high salaries
+- 
+*/
+
+CREATE OR REPLACE FUNCTION product_score(num_jobs INT, avg_salary NUMERIC)
+RETURNS NUMERIC AS $$
+BEGIN 
+    RETURN (num_jobs * avg_salary) / 1000000;
+END;
+$$ LANGUAGE plpgsql;
+
+
+WITH skills_demand AS (
+        WITH complete_table AS (
+        SELECT 
+            jpf.job_id, sjd.skill_id, sd.skills, jpf.salary_year_avg
+        FROM
+            job_postings_fact AS jpf
+        LEFT JOIN
+            skills_job_dim AS sjd
+        ON 
+            jpf.job_id = sjd.job_id
+        LEFT JOIN
+            skills_dim AS sd
+        ON
+            sjd.skill_id = sd.skill_id
+    )
+    SELECT skills, COUNT(*) AS num_jobs
+    FROM complete_table
+    WHERE skills IS NOT NULL AND salary_year_avg IS NOT NULL
+    GROUP BY skills
+    ORDER BY num_jobs DESC
+), avg_salary AS (
+    WITH complete_table AS (
+        SELECT 
+            jpf.job_id, jpf.salary_year_avg, sjd.skill_id, sd.skills
+        FROM
+            job_postings_fact AS jpf
+        LEFT JOIN
+            skills_job_dim AS sjd
+        ON 
+            jpf.job_id = sjd.job_id
+        LEFT JOIN
+            skills_dim AS sd
+        ON
+            sjd.skill_id = sd.skill_id
+        WHERE jpf.salary_year_avg IS NOT NULL 
+        AND jpf.job_title_short LIKE '%Data Analyst%'
+    ), output_table AS (
+        SELECT 
+            skills, 
+            COUNT(*) AS num_jobs_per_skill, 
+            AVG(salary_year_avg) AS avg_salary_per_skill
+        FROM complete_table
+        GROUP BY skills
+    ) SELECT *
+    FROM output_table
+    WHERE num_jobs_per_skill >= 10
+    ORDER BY avg_salary_per_skill DESC
+), final_output AS (
+    SELECT 
+        sd.skills, 
+        sd.num_jobs,
+        a_s.avg_salary_per_skill, 
+        product_score(sd.num_jobs::INT, a_s.avg_salary_per_skill::NUMERIC) AS product_score_value
+    FROM skills_demand AS sd
+    INNER JOIN avg_salary AS a_s
+    ON sd.skills = a_s.skills
+)
+SELECT *
+FROM final_output
+ORDER BY product_score_value DESC;
